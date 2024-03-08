@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "WinCord (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "WinCord (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
