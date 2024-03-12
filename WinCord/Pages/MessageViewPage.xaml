@@ -8,7 +8,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-
+    
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -28,7 +28,7 @@
                 <DataTemplate x:DataType="localmodel:Message">
                     <StackPanel BorderBrush="White" BorderThickness="2" CornerRadius="10" Orientation="Horizontal" Margin="0 10 0 10" Padding="10 0 0 0">
                         <TextBlock Margin="0 10 5 10" Text="{x:Bind UserNameFormatted}" FontWeight="Bold"/>
-                        <TextBlock Margin="0 10 0 10" Text="{x:Bind Content}"/>
+                        <TextBlock x:Name="MessageTextBlock" Margin="0 10 0 10" Text="{x:Bind Content}"/>
                     </StackPanel>
                 </DataTemplate>
             </ListView.ItemTemplate>
