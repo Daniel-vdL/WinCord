@@ -77,7 +77,7 @@ namespace WinCord
 
         private async void SendMessage_Click(object sender, RoutedEventArgs e)
         {
-            string messageContent = MessageTextBox.Text;
+            string messageContent = MessageSuggestBox.Text;
 
             // Check if the message content is not empty
             if (!string.IsNullOrWhiteSpace(messageContent))
@@ -115,7 +115,7 @@ namespace WinCord
             {
                 this.LoadMessages();
                 MessageListView.ScrollIntoView(newMessage);
-                MessageTextBox.Text = "";
+                MessageSuggestBox.Text = "";
             }
             else
             {
@@ -205,6 +205,30 @@ namespace WinCord
         {
             string emphasizedText = text.ToUpper() + "!!!";
             return emphasizedText;
+        }
+
+        private void AutoSuggestBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+        {
+            string userInput = sender.Text;
+
+            // Check if the user input starts with '/'
+            if (userInput.StartsWith("/"))
+            {
+                // Filter suggestions based on user input
+                string inputWithoutSlash = userInput.Substring(1);
+                IEnumerable<string> filteredSuggestions = GetCommandSuggestions().Where(s => s.StartsWith(inputWithoutSlash));
+                sender.ItemsSource = filteredSuggestions;
+            }
+            else
+            {
+                // If the user doesn't input '/', clear the suggestion list
+                sender.ItemsSource = null;
+            }
+        }
+
+        private List<string> GetCommandSuggestions()
+        {
+            return new List<string> { "/magic", "/reverse", "/emphasize" };
         }
     }
 }

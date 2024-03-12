@@ -36,7 +36,8 @@
 
         <!-- Message Input -->
         <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="10" HorizontalAlignment="Center">
-            <TextBox x:Name="MessageTextBox" MinWidth="250" PlaceholderText="Type your message here" VerticalAlignment="Center"/>
+            <!--<TextBox x:Name="MessageTextBox" MinWidth="250" PlaceholderText="Type your message here" VerticalAlignment="Center"/>-->
+            <AutoSuggestBox x:Name="MessageSuggestBox" TextChanged="AutoSuggestBox_TextChanged" MinWidth="250" PlaceholderText="Type your message here or / for commands" VerticalAlignment="Center" />
             <Button Content="Send" Padding="10 5 10 5" BorderBrush="White" BorderThickness="2" CornerRadius="10" Click="SendMessage_Click"/>
         </StackPanel>
     </Grid>
