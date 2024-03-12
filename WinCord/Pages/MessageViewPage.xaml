@@ -1,6 +1,3 @@
-<!-- Copyright (c) Microsoft Corporation and Contributors. -->
-<!-- Licensed under the MIT License. -->
-
 <Page
     x:Class="WinCord.MessageViewPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -13,19 +10,34 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
-        <Button Margin="0 10 0 0" Padding="10 5 10 5" BorderBrush="White" 
-                BorderThickness="2" CornerRadius="10" x:Name="ReturnButton" 
-                Click="ReturnButton_Click" Content="Return"/>
-        <ListView Margin="0 20 0 0" MaxWidth="350" Grid.Row="0" x:Name="MessageListView">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header with Return Button -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10">
+            <Button Padding="10 5 10 5" BorderBrush="White" BorderThickness="2" CornerRadius="10" x:Name="ReturnButton" Click="ReturnButton_Click" Content="Return"/>
+            <TextBlock Text="Chat Screen" Margin="10 0 0 10" VerticalAlignment="Center"/>
+        </StackPanel>
+
+        <!-- Message ListView -->
+        <ListView Grid.Row="1" Margin="10" MaxWidth="350" x:Name="MessageListView">
             <ListView.ItemTemplate>
                 <DataTemplate x:DataType="localmodel:Message">
-                    <StackPanel Orientation="Horizontal" Margin="0 10 0 10" Padding="10 0 0 0" BorderBrush="White" 
-                                BorderThickness="2" CornerRadius="10">
-                        <TextBlock Margin="0 10 5 10" Text="{x:Bind UserNameFormatted}"/>
+                    <StackPanel BorderBrush="White" BorderThickness="2" CornerRadius="10" Orientation="Horizontal" Margin="0 10 0 10" Padding="10 0 0 0">
+                        <TextBlock Margin="0 10 5 10" Text="{x:Bind UserNameFormatted}" FontWeight="Bold"/>
                         <TextBlock Margin="0 10 0 10" Text="{x:Bind Content}"/>
                     </StackPanel>
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
+
+        <!-- Message Input -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="10" HorizontalAlignment="Center">
+            <TextBox x:Name="MessageTextBox" MinWidth="250" PlaceholderText="Type your message here" VerticalAlignment="Center"/>
+            <Button Content="Send" Padding="10 5 10 5" BorderBrush="White" BorderThickness="2" CornerRadius="10" Click="SendMessage_Click"/>
+        </StackPanel>
     </Grid>
 </Page>

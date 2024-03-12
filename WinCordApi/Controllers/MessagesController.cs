@@ -96,16 +96,24 @@ namespace WinCordApi.Controllers
         // POST: api/Messages
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Message>> PostMessage(Message message)
+        public async Task<ActionResult<MessageDto>> PostMessage(MessageDto messageDto)
         {
           if (_context.Messages == null)
           {
               return Problem("Entity set 'AppDbContext.Messages'  is null.");
           }
+
+          var message = new Message
+          {
+              Content = messageDto.Content,
+              Username = messageDto.Username,
+              UserId = messageDto.UserId,
+          };
+
             _context.Messages.Add(message);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetMessage", new { id = message.Id }, message);
+            return CreatedAtAction("GetMessage", new { id = message.Id }, messageDto);
         }
 
         // DELETE: api/Messages/5

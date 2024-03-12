@@ -1,6 +1,3 @@
-// Copyright (c) Microsoft Corporation and Contributors.
-// Licensed under the MIT License.
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -20,14 +17,8 @@ using System.Text.Json.Serialization;
 using System.Text.Json;
 using WinCord.Models;
 
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
-
 namespace WinCord.Pages
 {
-    /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
-    /// </summary>
     public sealed partial class RegistrationPage : Page
     {
         public RegistrationPage()
@@ -39,37 +30,40 @@ namespace WinCord.Pages
         {
             var username = UsernameTextbox.Text;
 
-            using var client = new HttpClient();
-
-            var user = new User
+            if (!string.IsNullOrWhiteSpace(username))
             {
-                Name = username,
-            };
+                using var client = new HttpClient();
 
-            var userJson = JsonSerializer.Serialize(user);
+                var user = new User
+                {
+                    Name = username,
+                };
 
-            var context = new StringContent(userJson, System.Text.Encoding.UTF8, "Application/Json");
+                var userJson = JsonSerializer.Serialize(user);
 
-            var response = await client.PostAsync("https://localhost:7239/api/Users", context);
+                var context = new StringContent(userJson, System.Text.Encoding.UTF8, "Application/Json");
 
-            if (!response.IsSuccessStatusCode)
-            {
-                return;
+                var response = await client.PostAsync("https://localhost:7239/api/Users", context);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    return;
+                }
+
+                var answerJson = await response.Content.ReadAsStringAsync();
+
+                var options = new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true,
+                };
+
+                var answerUser = JsonSerializer.Deserialize<User>(answerJson, options);
+
+                User.CurrentLoggedInUser = answerUser;
+
+                this.Frame.Navigate(typeof(MessageViewPage));
+
             }
-
-            var answerJson = await response.Content.ReadAsStringAsync();
-
-            var options = new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true,
-            };
-
-            var answerUser = JsonSerializer.Deserialize<User>(answerJson, options);
-
-            User.CurrentLoggedInUser  = answerUser;
-
-            this.Frame.Navigate(typeof(MessageViewPage));
-
         }
     }
 }

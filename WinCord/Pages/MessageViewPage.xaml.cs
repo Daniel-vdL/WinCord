@@ -1,6 +1,3 @@
-// Copyright (c) Microsoft Corporation and Contributors.
-// Licensed under the MIT License.
-
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -30,7 +27,7 @@ namespace WinCord
         {
             this.InitializeComponent();
             _timer = new DispatcherTimer();
-            _timer.Interval = TimeSpan.FromSeconds(10);
+            _timer.Interval = TimeSpan.FromSeconds(30);
             _timer.Tick += Timer_Tick;
         }
 
@@ -74,7 +71,41 @@ namespace WinCord
 
         private void Timer_Tick(object sender, object e)
         {
-           this.LoadMessages(); // Reload messages every 5 seconds
+           this.LoadMessages();
+        }
+
+        private async void SendMessage_Click(object sender, RoutedEventArgs e)
+        {
+            string messageContent = MessageTextBox.Text;
+
+            using var client = new HttpClient();
+
+            // Check if the message content is not empty
+            if (!string.IsNullOrWhiteSpace(messageContent))
+            {
+                // Create a new Message object with the user's input
+                var newMessage = new Message
+                {
+                    Username = User.CurrentLoggedInUser.Name,
+                    UserId = User.CurrentLoggedInUser.Id,
+                    Content = messageContent
+                };
+
+                var messageJson = JsonSerializer.Serialize(newMessage);
+
+                var context = new StringContent(messageJson, System.Text.Encoding.UTF8, "Application/Json");
+
+                var response = await client.PostAsync("https://localhost:7239/api/Messages", context);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    return;
+                }
+
+                this.LoadMessages();
+                MessageListView.ScrollIntoView(newMessage);
+                MessageTextBox.Text = "";
+            }
         }
     }
 }
