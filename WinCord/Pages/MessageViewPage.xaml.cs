@@ -79,10 +79,8 @@ namespace WinCord
         {
             string messageContent = MessageSuggestBox.Text;
 
-            // Check if the message content is not empty
             if (!string.IsNullOrWhiteSpace(messageContent))
             {
-                // Check if the message is a command
                 if (messageContent.StartsWith("/"))
                 {
                     HandleCommand(messageContent);
@@ -153,16 +151,42 @@ namespace WinCord
                     string emphasizedMessage = $"{EmphasizeText(emphasizedContent)}";
                     await SendMessage(emphasizedMessage);
                 }
+                else if (command.StartsWith("/help"))
+                {
+                    string commands = "• /magic: Cast a random spell!\n" +
+                    "• /reverse: Reverse your text!\n" +
+                    "• /emphasize: Emphasize your text!";
+
+                    ContentDialog ErrorDialog = new ContentDialog
+                    {
+                        Title = "Available Commands",
+                        Content = new TextBlock
+                        {
+                            Text = commands,
+                            TextWrapping = TextWrapping.Wrap,
+                            Margin = new Thickness(0, 0, 0, 16),
+                        },
+                        CloseButtonText = "Continue",
+                        XamlRoot = this.XamlRoot,
+                    };
+
+                    ContentDialogResult result = await ErrorDialog.ShowAsync();
+                }
                 else
                 {
-                    // Command not recognized
-                    string errorMessage = "Command not recognized. Type / for available commands.";
-                    await SendMessage(errorMessage);
+                    ContentDialog ErrorDialog = new ContentDialog
+                    {
+                        Title = "Command not found!",
+                        Content = "Click 'Ok' to continue",
+                        CloseButtonText = "Ok",
+                        XamlRoot = this.XamlRoot,
+                    };
+
+                    ContentDialogResult result = await ErrorDialog.ShowAsync();
                 }
             }
             else
             {
-                // Regular message, not a command
                 await SendMessage(command);
             }
         }
@@ -211,7 +235,6 @@ namespace WinCord
         {
             string userInput = sender.Text;
 
-            // Check if the user input starts with '/'
             if (userInput.StartsWith("/"))
             {
                 // Filter suggestions based on user input
@@ -221,14 +244,13 @@ namespace WinCord
             }
             else
             {
-                // If the user doesn't input '/', clear the suggestion list
                 sender.ItemsSource = null;
             }
         }
 
         private List<string> GetCommandSuggestions()
         {
-            return new List<string> { "/magic", "/reverse", "/emphasize" };
+            return new List<string> { "/help", "/magic", "/reverse", "/emphasize" };
         }
     }
 }

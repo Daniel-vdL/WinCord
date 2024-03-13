@@ -16,13 +16,11 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- Header with Return Button -->
         <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10">
             <Button Padding="10 5 10 5" BorderBrush="White" BorderThickness="2" CornerRadius="10" x:Name="ReturnButton" Click="ReturnButton_Click" Content="Return"/>
             <TextBlock Text="Chat Screen" Margin="10 0 0 10" VerticalAlignment="Center"/>
         </StackPanel>
 
-        <!-- Message ListView -->
         <ListView Grid.Row="1" Margin="10" MaxWidth="350" x:Name="MessageListView">
             <ListView.ItemTemplate>
                 <DataTemplate x:DataType="localmodel:Message">
@@ -34,9 +32,7 @@
             </ListView.ItemTemplate>
         </ListView>
 
-        <!-- Message Input -->
         <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="10" HorizontalAlignment="Center">
-            <!--<TextBox x:Name="MessageTextBox" MinWidth="250" PlaceholderText="Type your message here" VerticalAlignment="Center"/>-->
             <AutoSuggestBox x:Name="MessageSuggestBox" TextChanged="AutoSuggestBox_TextChanged" MinWidth="250" PlaceholderText="Type your message here or / for commands" VerticalAlignment="Center" />
             <Button Content="Send" Padding="10 5 10 5" BorderBrush="White" BorderThickness="2" CornerRadius="10" Click="SendMessage_Click"/>
         </StackPanel>
