@@ -94,6 +94,7 @@ namespace WinCordApi.Controllers
             {
                 Name = userDto.Name,
                 Points = 0,
+                Password = userDto.Password
             };
 
             _context.User.Add(user);

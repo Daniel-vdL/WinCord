@@ -7,6 +7,7 @@ namespace WinCordApi.Models
     public class AppDbContext : DbContext
     {
         public DbSet<Message> Messages { get; set; }
+        public DbSet<User> Users { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -27,7 +28,7 @@ namespace WinCordApi.Models
                 new Message { Id = 2, Content = "Test", UserId = 1, Username = "Lorem" });
 
             modelBuilder.Entity<User>().HasData(
-                new User { Id = 1, Name = "Tom" });
+                new User { Id = 1, Name = "Tom", Password = SecureHasher.Hash("1234") });
         }
 
         public DbSet<WinCordApi.Models.User> User { get; set; } = default!;
