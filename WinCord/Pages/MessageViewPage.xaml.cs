@@ -12,6 +12,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text.Json;
+using System.Threading.Tasks;
 using WinCord.Models;
 using WinCord.Pages;
 using Windows.Foundation;
@@ -76,36 +77,180 @@ namespace WinCord
 
         private async void SendMessage_Click(object sender, RoutedEventArgs e)
         {
-            string messageContent = MessageTextBox.Text;
+            string messageContent = MessageSuggestBox.Text;
 
-            using var client = new HttpClient();
-
-            // Check if the message content is not empty
             if (!string.IsNullOrWhiteSpace(messageContent))
             {
-                // Create a new Message object with the user's input
-                var newMessage = new Message
+                if (messageContent.StartsWith("/"))
                 {
-                    Username = User.CurrentLoggedInUser.Name,
-                    UserId = User.CurrentLoggedInUser.Id,
-                    Content = messageContent
-                };
-
-                var messageJson = JsonSerializer.Serialize(newMessage);
-
-                var context = new StringContent(messageJson, System.Text.Encoding.UTF8, "Application/Json");
-
-                var response = await client.PostAsync("https://localhost:7239/api/Messages", context);
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    return;
+                    HandleCommand(messageContent);
                 }
+                else
+                {
+                    await SendMessage(messageContent);
+                }
+            }
+        }
 
+        private async Task SendMessage(string messageContent)
+        {
+            using var client = new HttpClient();
+
+            var newMessage = new Message
+            {
+                Username = User.CurrentLoggedInUser.Name,
+                UserId = User.CurrentLoggedInUser.Id,
+                Content = messageContent
+            };
+
+            var messageJson = JsonSerializer.Serialize(newMessage);
+
+            var context = new StringContent(messageJson, System.Text.Encoding.UTF8, "Application/Json");
+
+            var response = await client.PostAsync("https://localhost:7239/api/Messages", context);
+
+            if (response.IsSuccessStatusCode)
+            {
                 this.LoadMessages();
                 MessageListView.ScrollIntoView(newMessage);
-                MessageTextBox.Text = "";
+                MessageSuggestBox.Text = "";
             }
+            else
+            {
+                ContentDialog ErrorDialog = new ContentDialog
+                {
+                    Title = "Message creation failed!",
+                    Content = "Click 'Ok' to continue",
+                    CloseButtonText = "Ok",
+                    XamlRoot = this.XamlRoot,
+                };
+
+                ContentDialogResult result = await ErrorDialog.ShowAsync();
+            }
+        }
+
+        private async void HandleCommand(string command)
+        {
+            if (command.StartsWith("/"))
+            {
+                if (command.StartsWith("/magic"))
+                {
+                    string originalContent = command.Substring("/magic".Length).Trim();
+                    string transformedContent = PerformMagic(originalContent);
+                    string magicMessage = $"[MAGIC] {transformedContent}";
+                    await SendMessage(magicMessage);
+                }
+                else if (command.StartsWith("/reverse"))
+                {
+                    string reversedContent = ReverseText(command.Substring("/reverse".Length).Trim());
+                    await SendMessage(reversedContent);
+                }
+                else if (command.StartsWith("/emphasize"))
+                {
+                    string emphasizedContent = command.Substring("/emphasize".Length).Trim();
+                    string emphasizedMessage = $"{EmphasizeText(emphasizedContent)}";
+                    await SendMessage(emphasizedMessage);
+                }
+                else if (command.StartsWith("/help"))
+                {
+                    string commands = "• /magic: Cast a random spell!\n" +
+                    "• /reverse: Reverse your text!\n" +
+                    "• /emphasize: Emphasize your text!";
+
+                    ContentDialog ErrorDialog = new ContentDialog
+                    {
+                        Title = "Available Commands",
+                        Content = new TextBlock
+                        {
+                            Text = commands,
+                            TextWrapping = TextWrapping.Wrap,
+                            Margin = new Thickness(0, 0, 0, 16),
+                        },
+                        CloseButtonText = "Continue",
+                        XamlRoot = this.XamlRoot,
+                    };
+
+                    ContentDialogResult result = await ErrorDialog.ShowAsync();
+                }
+                else
+                {
+                    ContentDialog ErrorDialog = new ContentDialog
+                    {
+                        Title = "Command not found!",
+                        Content = "Click 'Ok' to continue",
+                        CloseButtonText = "Ok",
+                        XamlRoot = this.XamlRoot,
+                    };
+
+                    ContentDialogResult result = await ErrorDialog.ShowAsync();
+                }
+            }
+            else
+            {
+                await SendMessage(command);
+            }
+        }
+
+        private string PerformMagic(string text)
+        {
+            string[] magicTransformations = {
+                "Abracadabra!",
+                "Presto!",
+                "Voila!",
+                "Hocus Pocus!",
+                "Alakazam!",
+                "Shazam!",
+                "Wingardium Leviosa!",
+                "Expecto Patronum!",
+                "Expelliarmus!",
+                "Avada Kedavra!",
+                "Accio!",
+                "Alohomora!",
+                "Lumos!",
+                "Nox!",
+                "Riddikulus!",
+            };
+
+            Random random = new Random();
+            int index = random.Next(magicTransformations.Length);
+            string transformation = magicTransformations[index];
+
+            return $"{transformation} {text}";
+        }
+
+        private string ReverseText(string text)
+        {
+            char[] charArray = text.ToCharArray();
+            Array.Reverse(charArray);
+            return new string(charArray);
+        }
+
+        private string EmphasizeText(string text)
+        {
+            string emphasizedText = text.ToUpper() + "!!!";
+            return emphasizedText;
+        }
+
+        private void AutoSuggestBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+        {
+            string userInput = sender.Text;
+
+            if (userInput.StartsWith("/"))
+            {
+                // Filter suggestions based on user input
+                string inputWithoutSlash = userInput.Substring(1);
+                IEnumerable<string> filteredSuggestions = GetCommandSuggestions().Where(s => s.StartsWith(inputWithoutSlash));
+                sender.ItemsSource = filteredSuggestions;
+            }
+            else
+            {
+                sender.ItemsSource = null;
+            }
+        }
+
+        private List<string> GetCommandSuggestions()
+        {
+            return new List<string> { "/help", "/magic", "/reverse", "/emphasize" };
         }
     }
 }
