@@ -22,7 +22,7 @@ namespace WinCord
         {
             this.InitializeComponent();
 
-            this.rootFrame.Navigate(typeof(RegistrationPage));
+            this.rootFrame.Navigate(typeof(LoginPage));
         }
     }
 }

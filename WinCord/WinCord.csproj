@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net6.0-windows10.0.19041.0</TargetFramework>
@@ -14,6 +14,7 @@
   <ItemGroup>
     <None Remove="MainViewPage.xaml" />
     <None Remove="MessageViewPage.xaml" />
+    <None Remove="Pages\LoginPage.xaml" />
     <None Remove="Pages\RegistrationPage.xaml" />
     <None Remove="RegistrationPage.xaml" />
   </ItemGroup>
@@ -42,6 +43,11 @@
   -->
   <ItemGroup Condition="'$(DisableMsixProjectCapabilityAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
     <ProjectCapability Include="Msix" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Pages\LoginPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="RegistrationPage.xaml">

@@ -22,13 +22,25 @@ namespace WinCordApi.Controllers
 
         // GET: api/Users
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<User>>> GetUser()
+        public async Task<ActionResult<IEnumerable<UserDto>>> GetUser()
         {
-          if (_context.User == null)
-          {
-              return NotFound();
-          }
-            return await _context.User.ToListAsync();
+            var users = await _context.Users
+                .ToListAsync();
+
+            var userDto = new List<UserDto>();
+
+            foreach (var user in users) 
+            {
+                userDto.Add(new UserDto
+                {
+                    Id = user.Id,
+                    Name = user.Name,
+                    Password = user.Password,
+                    Points = user.Points,
+                });
+            }
+
+            return userDto;
         }
 
         // GET: api/Users/5
