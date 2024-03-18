@@ -16,6 +16,7 @@ using System.Text;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using WinCord.Models;
+using System.Security.Cryptography;
 
 namespace WinCord.Pages
 {
@@ -42,26 +43,32 @@ namespace WinCord.Pages
             var username = UsernameTextbox.Text;
             var password = PasswordTextbox.Text;
 
-            var authenticatedUser = users.FirstOrDefault(u => u.Name == username && u.Password == password);
-
-            if (authenticatedUser != null)
+            foreach ( var user in users )
             {
-                User.CurrentLoggedInUser = authenticatedUser;
-
-                this.Frame.Navigate(typeof(MessageViewPage));
-            }
-            else
-            {
-                ContentDialog ErrorDialog = new ContentDialog
+                if (username == user.Name && VerifyPassword(password, user.Password))
                 {
-                    Title = "Message creation failed!",
-                    Content = "Click 'Ok' to continue",
-                    CloseButtonText = "Ok",
-                    XamlRoot = this.XamlRoot,
-                };
+                    User.CurrentLoggedInUser = user;
 
-                ContentDialogResult result = await ErrorDialog.ShowAsync();
+                    this.Frame.Navigate(typeof(MessageViewPage));
+                }
+                else
+                {
+                    ContentDialog ErrorDialog = new ContentDialog
+                    {
+                        Title = "Login failed!",
+                        Content = "Click 'Ok' to continue",
+                        CloseButtonText = "Ok",
+                        XamlRoot = this.XamlRoot,
+                    };
+
+                    ContentDialogResult result = await ErrorDialog.ShowAsync();
+                }
             }
+        }
+
+        private bool VerifyPassword(string password, string hashedPassword)
+        {
+            return SecureHasher.Verify(password, hashedPassword);
         }
     }
 }
