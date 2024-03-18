@@ -70,5 +70,10 @@ namespace WinCord.Pages
         {
             return SecureHasher.Verify(password, hashedPassword);
         }
+
+        private void RegisterButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.Frame.Navigate(typeof(RegistrationPage));
+        }
     }
 }

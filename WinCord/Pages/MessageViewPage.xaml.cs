@@ -67,7 +67,7 @@ namespace WinCord
 
         private void ReturnButton_Click(object sender, RoutedEventArgs e)
         {
-            this.Frame.Navigate(typeof(RegistrationPage));
+            this.Frame.Navigate(typeof(LoginPage));
         }
 
         private void Timer_Tick(object sender, object e)

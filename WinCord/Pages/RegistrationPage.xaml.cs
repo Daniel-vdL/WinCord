@@ -29,6 +29,7 @@ namespace WinCord.Pages
         private async void RegisterButton_Click(object sender, RoutedEventArgs e)
         {
             var username = UsernameTextbox.Text;
+            var password = PasswordTextbox.Text;
 
             if (!string.IsNullOrWhiteSpace(username))
             {
@@ -37,7 +38,7 @@ namespace WinCord.Pages
                 var user = new User
                 {
                     Name = username,
-                    Password = "0"
+                    Password = SecureHasher.Hash(password)
                 };
 
                 var userJson = JsonSerializer.Serialize(user);
@@ -65,6 +66,11 @@ namespace WinCord.Pages
                 this.Frame.Navigate(typeof(MessageViewPage));
 
             }
+        }
+
+        private void LoginButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.Frame.Navigate(typeof(LoginPage));
         }
     }
 }
