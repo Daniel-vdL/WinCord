@@ -28,7 +28,7 @@ namespace WinCordApi.Models
                 new Message { Id = 2, Content = "Test", UserId = 1, Username = "Lorem" });
 
             modelBuilder.Entity<User>().HasData(
-                new User { Id = 1, Name = "Tom", Password = SecureHasher.Hash("1234") });
+                new User { Id = 1, Name = "Tom", Password = SecureHasher.Hash("1234")});
         }
 
         public DbSet<WinCordApi.Models.User> User { get; set; } = default!;

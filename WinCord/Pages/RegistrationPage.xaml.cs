@@ -38,7 +38,7 @@ namespace WinCord.Pages
                 var user = new User
                 {
                     Name = username,
-                    Password = SecureHasher.Hash(password)
+                    Password = password
                 };
 
                 var userJson = JsonSerializer.Serialize(user);

@@ -27,20 +27,19 @@ namespace WinCordApi.Controllers
             var users = await _context.Users
                 .ToListAsync();
 
-            var userDto = new List<UserDto>();
+            var userDtos = new List<UserDto>();
 
             foreach (var user in users) 
             {
-                userDto.Add(new UserDto
+                userDtos.Add(new UserDto
                 {
                     Id = user.Id,
                     Name = user.Name,
-                    Password = user.Password,
                     Points = user.Points,
                 });
             }
 
-            return userDto;
+            return userDtos;
         }
 
         // GET: api/Users/5
@@ -95,7 +94,7 @@ namespace WinCordApi.Controllers
         // POST: api/Users
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<User>> PostUser(UserDto userDto)
+        public async Task<ActionResult<User>> PostUser(UserLoginDto userLoginDto)
         {
             if (_context.User == null)
             {
@@ -104,17 +103,17 @@ namespace WinCordApi.Controllers
 
             var user = new User()
             {
-                Name = userDto.Name,
-                Points = 0,
-                Password = userDto.Password
+                Name = userLoginDto.Name,
+                Password = SecureHasher.Hash(userLoginDto.Password),
             };
 
             _context.User.Add(user);
             await _context.SaveChangesAsync();
 
-            userDto.Id = user.Id;
+            userLoginDto.Id = user.Id;
 
-            return CreatedAtAction("GetUser", new { id = user.Id }, userDto);
+            userLoginDto.Password = "";
+            return CreatedAtAction("GetUser", new { id = user.Id }, userLoginDto);
         }
 
         // DELETE: api/Users/5
@@ -140,6 +139,38 @@ namespace WinCordApi.Controllers
         private bool UserExists(int id)
         {
             return (_context.User?.Any(e => e.Id == id)).GetValueOrDefault();
+        }
+
+        private bool VerifyPassword(string password, string hashedPassword)
+        {
+            return SecureHasher.Verify(password, hashedPassword);
+        }
+
+        // POST: api/Users/Login
+        [HttpPost("Login")]
+        public async Task<ActionResult<User>> PostUserLogin(UserLoginDto userLoginDto)
+        {
+            if (_context.User == null)
+            {
+                return Problem("Entity set 'AppDbContext.User'  is null.");
+            }
+
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Name == userLoginDto.Name);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            else if (VerifyPassword(userLoginDto.Password, user.Password))
+            {
+                userLoginDto.Id = user.Id;
+                userLoginDto.Password = "";
+                return CreatedAtAction("PostUserLogin", userLoginDto);
+            }
+
+            return NotFound();
+
         }
     }
 }

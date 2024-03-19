@@ -29,46 +29,49 @@ namespace WinCord.Pages
 
         private async void LoginButton_Click(object sender, RoutedEventArgs e)
         {
+            var username = UsernameTextbox.Text;
+            var password = PasswordTextbox.Text;
             var client = new HttpClient();
-            var response = await client.GetAsync("https://localhost:7239/api/Users");
-            var content = await response.Content.ReadAsStringAsync();
+
+            var user = new User
+            {
+                Name = username,
+                Password = password
+            };
+
+            var userJson = JsonSerializer.Serialize(user);
+
+            var context = new StringContent(userJson, System.Text.Encoding.UTF8, "Application/Json");
+
+            var response = await client.PostAsync("https://localhost:7239/api/Users/Login", context);
+
+            if (response.IsSuccessStatusCode == false)
+            {
+                ContentDialog ErrorDialog = new ContentDialog
+                {
+                    Title = "Login failed!",
+                    Content = "Click 'Ok' to continue",
+                    CloseButtonText = "Ok",
+                    XamlRoot = this.XamlRoot,
+                };
+
+                ContentDialogResult result = await ErrorDialog.ShowAsync();
+
+                return;
+            }
+
+            var answerJson = await response.Content.ReadAsStringAsync();
 
             var options = new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true,
             };
 
-            var users = JsonSerializer.Deserialize<List<User>>(content, options);
+            var answerUser = JsonSerializer.Deserialize<User>(answerJson, options);
 
-            var username = UsernameTextbox.Text;
-            var password = PasswordTextbox.Text;
+            User.CurrentLoggedInUser = answerUser;
 
-            foreach ( var user in users )
-            {
-                if (username == user.Name && VerifyPassword(password, user.Password))
-                {
-                    User.CurrentLoggedInUser = user;
-
-                    this.Frame.Navigate(typeof(MessageViewPage));
-                }
-                else
-                {
-                    ContentDialog ErrorDialog = new ContentDialog
-                    {
-                        Title = "Login failed!",
-                        Content = "Click 'Ok' to continue",
-                        CloseButtonText = "Ok",
-                        XamlRoot = this.XamlRoot,
-                    };
-
-                    ContentDialogResult result = await ErrorDialog.ShowAsync();
-                }
-            }
-        }
-
-        private bool VerifyPassword(string password, string hashedPassword)
-        {
-            return SecureHasher.Verify(password, hashedPassword);
+            this.Frame.Navigate(typeof(MessageViewPage));
         }
 
         private void RegisterButton_Click(object sender, RoutedEventArgs e)
